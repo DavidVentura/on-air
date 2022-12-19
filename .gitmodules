@@ -1,0 +1,3 @@
+[submodule "go-media-devices-state"]
+	path = go-media-devices-state
+	url = git@github.com:DavidVentura/go-media-devices-state.git
