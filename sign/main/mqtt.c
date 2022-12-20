@@ -34,6 +34,15 @@ static const char *MTAG = "MQTT_EXAMPLE";
 
 static void set_led(uint8_t state);
 
+struct Node {
+    struct Node*    next;
+    char*           topic;
+    uint8_t         value;
+};
+
+typedef struct Node Node;
+Node* nodes = NULL;
+
 static void log_error_if_nonzero(const char *message, int error_code)
 {
     if (error_code != 0) {
@@ -41,6 +50,38 @@ static void log_error_if_nonzero(const char *message, int error_code)
     }
 }
 
+void process_event(char* topic, uint8_t topic_len, uint8_t value) {
+        Node* first_node = nodes;
+        Node* prev_node = NULL;
+        while(nodes != NULL && (strncmp(nodes->topic, topic, topic_len) != 0)) {
+            prev_node = nodes;
+            nodes = nodes->next;
+        }
+
+        if (nodes == NULL) {
+            nodes = malloc(sizeof(Node));
+            nodes->next = NULL;
+            nodes->topic = malloc(topic_len+1);
+            memset(nodes->topic, 0, topic_len+1);
+            strncpy(nodes->topic, topic, topic_len);
+            if (prev_node != NULL) {
+                prev_node->next = nodes;
+            }
+        }
+        nodes->value = value;
+
+        if (first_node != NULL) {
+            nodes = first_node;
+        }
+}
+
+static bool is_any_node_one(Node* node) {
+    while(node != NULL) {
+        if (node->value == 1) return true;
+        node = node->next;
+    }
+    return false;
+}
 /*
  * @brief Event handler registered to receive MQTT events
  *
@@ -82,11 +123,19 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
         printf("TOPIC=%.*s\r\n", event->topic_len, event->topic);
         printf("DATA=%.*s\r\n", event->data_len, event->data);
 
-        if (event->data[0] == '0') {
-            set_led(0);
-        } else if (event->data[0] == '1') {
+        process_event(event->topic, event->topic_len, (event->data[0] == '0') ? 0 : 1);
+        Node* first = nodes;
+        if(is_any_node_one(nodes)){
             set_led(1);
+        } else {
+            set_led(0);
         }
+        nodes = first;
+        while(nodes != NULL) {
+            printf("Node %s, v %d\n", nodes->topic, nodes->value);
+            nodes = nodes->next;
+        }
+        nodes = first;
         break;
     case MQTT_EVENT_ERROR:
         ESP_LOGI(MTAG, "MQTT_EVENT_ERROR");
