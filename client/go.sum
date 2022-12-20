@@ -1,5 +1,7 @@
 github.com/davidventura/go-media-devices-state v0.0.0-20221219214959-1dec3c2b9771 h1:pdY6LbtCR3PRIJma69fI1MWICqSujadGbvD39JSHS+M=
 github.com/davidventura/go-media-devices-state v0.0.0-20221219214959-1dec3c2b9771/go.mod h1:nUoOoBFbDxg7CC8nEcTcklzH1gvgZZTvD3CdCYX2PvA=
+github.com/davidventura/go-media-devices-state v0.0.0-20221219225323-531985d54e5a h1:zzU6aK+CRL2NAjVYj25XZpbKdyF9xCx67PvMbuaBDJs=
+github.com/davidventura/go-media-devices-state v0.0.0-20221219225323-531985d54e5a/go.mod h1:nUoOoBFbDxg7CC8nEcTcklzH1gvgZZTvD3CdCYX2PvA=
 github.com/eclipse/paho.mqtt.golang v1.4.2 h1:66wOzfUHSSI1zamx7jR6yMEI5EuHnT1G6rNA5PM12m4=
 github.com/eclipse/paho.mqtt.golang v1.4.2/go.mod h1:JGt0RsEwEX+Xa/agj90YJ9d9DH2b7upDZMK9HRbFvCA=
 github.com/gorilla/websocket v1.4.2 h1:+/TMaTYc4QFitKJxsQ7Yye35DkWvkdLcvGKqM+x0Ufc=
