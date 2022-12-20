@@ -9,6 +9,9 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
+var client mqtt.Client
+var host string
+
 var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 	fmt.Printf("Received message: %s from topic: %s\n", msg.Payload(), msg.Topic())
 }
@@ -19,26 +22,33 @@ var connectHandler mqtt.OnConnectHandler = func(client mqtt.Client) {
 
 var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {
 	fmt.Printf("Connect lost: %v", err)
+	time.Sleep(1 * time.Second)
+	fmt.Println("Reconnecting")
 }
 
-func main() {
+func createClient() {
 	broker := "iot.labs"
 	port := 1883
-	host, err := os.Hostname()
-	if err != nil {
-		panic(err)
-	}
-
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(fmt.Sprintf("tcp://%s:%d", broker, port))
 	opts.SetClientID(host)
 	opts.SetDefaultPublishHandler(messagePubHandler)
 	opts.OnConnect = connectHandler
 	opts.OnConnectionLost = connectLostHandler
-	client := mqtt.NewClient(opts)
+	client = mqtt.NewClient(opts)
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
 		panic(token.Error())
 	}
+
+}
+
+func main() {
+	_host, err := os.Hostname()
+	if err != nil {
+		panic(err)
+	}
+	host = _host
+	createClient()
 
 	mediaDevices.InitDevices()
 	lastCameraValue := false
@@ -76,6 +86,6 @@ func main() {
 			token.Wait()
 		}
 
-		time.Sleep(20 * time.Millisecond)
+		time.Sleep(150 * time.Millisecond)
 	}
 }
